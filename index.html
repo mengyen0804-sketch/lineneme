@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>余雿秦｜衛星犬 電子名片</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;900&display=swap" rel="stylesheet">
+<style>
+/* ===== 只要改這兩行 ===== */
+/* 在下方 <script> 裡的 CONFIG 填入 LIFF ID 與 LINE 加好友網址 */
+:root{
+  --red:#D7262E; --blue:#1E9AD6; --green:#2E9B47; --line:#06C755;
+  --ink:#1A1A1A; --muted:#6F6F6F; --paper:#FFFFFF; --bg:#EEF0F2; --rule:#E2E2E2;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --ink:#F2F2F2; --muted:#A8A8A8; --paper:#1E2023; --bg:#121315; --rule:#33363A; color-scheme:dark; }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;padding:28px 16px 40px;}
+.card{width:100%;max-width:380px;background:var(--paper);border-radius:14px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 12px 32px -12px rgba(0,0,0,.25)}
+.inner{padding:22px 22px 18px}
+.brand{display:flex;justify-content:space-between;align-items:center}
+.brand b{color:var(--red);font-weight:900;font-size:1.4rem;letter-spacing:.04em}
+.values{display:flex;gap:10px;font-size:.78rem;font-weight:500}
+.values span:nth-child(1){color:var(--blue)}.values span:nth-child(2){color:var(--green)}.values span:nth-child(3){color:var(--red)}
+.tri{display:flex;height:3px;margin-top:10px}
+.tri i{flex:1}.tri i:nth-child(1){background:var(--blue)}.tri i:nth-child(2){background:var(--green)}.tri i:nth-child(3){background:var(--red)}
+h1{font-size:2.3rem;font-weight:900;margin:22px 0 2px;letter-spacing:.12em}
+.role{color:var(--muted);font-size:.9rem;margin:0}
+.co{font-weight:900;font-size:1.05rem;margin:14px 0 0;letter-spacing:.02em}
+dl{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);display:grid;grid-template-columns:3.4em 1fr;gap:8px 10px;font-size:.92rem}
+dt{color:var(--muted);font-size:.78rem;padding-top:.15em}
+dd{margin:0;word-break:break-word}
+dd a{color:var(--blue);text-decoration:none}
+.bar{background:var(--red);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 22px}
+.bar a{color:#fff;font-weight:900;text-decoration:none;letter-spacing:.06em}
+.bar span{font-size:.8rem;letter-spacing:.2em}
+.actions{width:100%;max-width:380px;margin-top:22px;display:grid;gap:10px}
+button,.btn{font:inherit;font-weight:500;font-size:1rem;border:0;border-radius:10px;padding:14px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+#share{background:var(--line);color:#fff;font-size:1.05rem}
+#share:disabled{opacity:.5;cursor:default}
+.btn{background:var(--paper);color:var(--ink);border:1px solid var(--rule)}
+button:focus-visible,.btn:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+#status{min-height:1.4em;margin:6px 0 0;text-align:center;color:var(--muted);font-size:.88rem}
+</style>
+</head>
+<body>
+<article class="card" aria-label="電子名片預覽">
+  <div class="inner">
+    <div class="brand"><b>衛星犬</b><div class="values"><span>價值</span><span>誠信</span><span>感動</span></div></div>
+    <div class="tri" aria-hidden="true"><i></i><i></i><i></i></div>
+    <h1>余雿秦</h1>
+    <p class="role">業務處　中南區經理</p>
+    <p class="co">弋揚科技股份有限公司</p>
+    <dl>
+      <dt>手機</dt><dd><a href="tel:0983105035">0983-105-035</a></dd>
+      <dt>電話</dt><dd><a href="tel:+886222234263,5003">02-2223-4263 #5003</a></dd>
+      <dt>傳真</dt><dd>07-555-0330</dd>
+      <dt>Email</dt><dd><a href="mailto:eason@eup.com.tw">eason@eup.com.tw</a></dd>
+      <dt>地址</dt><dd><a id="map" target="_blank" rel="noopener">高雄市鼓山區大順一路439號4樓之2</a></dd>
+    </dl>
+  </div>
+  <div class="bar"><a href="tel:0800060958">0800-060-958</a><span>服務快速．安全守護</span></div>
+</article>
+
+<div class="actions">
+  <button id="share" disabled>傳送名片給 LINE 好友</button>
+  <a class="btn" id="addLine" target="_blank" rel="noopener">加我 LINE 好友</a>
+  <p id="status" role="status">載入中…</p>
+</div>
+
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+/* ======== 設定：只要改這裡 ======== */
+const CONFIG = {
+  LIFF_ID: "請填入你的LIFF_ID",                 // 例如 2001234567-AbCdEfGh
+  LINE_URL: "https://line.me/ti/p/請換成你的LINE加好友網址" // LINE > 主頁 > 加入好友 > QR Code > 分享連結
+};
+/* ================================== */
+
+const MAP_URL = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("高雄市鼓山區大順一路439號4樓之2");
+document.getElementById("map").href = MAP_URL;
+document.getElementById("addLine").href = CONFIG.LINE_URL;
+
+const FLEX_TEMPLATE = {
+  "type": "flex",
+  "altText": "余雿秦｜弋揚科技 衛星犬 電子名片",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "0px",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "vertical",
+          "paddingAll": "20px",
+          "paddingBottom": "16px",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "衛星犬",
+                  "weight": "bold",
+                  "size": "xl",
+                  "color": "#D7262E",
+                  "flex": 0
+                },
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "sm",
+                  "justifyContent": "flex-end",
+                  "alignItems": "center",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "價值",
+                      "size": "xs",
+                      "color": "#1E9AD6",
+                      "flex": 0,
+                      "weight": "bold"
+                    },
+                    {
+                      "type": "text",
+                      "text": "誠信",
+                      "size": "xs",
+                      "color": "#2E9B47",
+                      "flex": 0,
+                      "weight": "bold"
+                    },
+                    {
+                      "type": "text",
+                      "text": "感動",
+                      "size": "xs",
+                      "color": "#D7262E",
+                      "flex": 0,
+                      "weight": "bold"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "height": "3px",
+              "margin": "md",
+              "contents": [
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "backgroundColor": "#1E9AD6",
+                  "contents": []
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "backgroundColor": "#2E9B47",
+                  "contents": []
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "backgroundColor": "#D7262E",
+                  "contents": []
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "余雿秦",
+              "weight": "bold",
+              "size": "3xl",
+              "color": "#1A1A1A",
+              "margin": "xl"
+            },
+            {
+              "type": "text",
+              "text": "業務處　中南區經理",
+              "size": "sm",
+              "color": "#7A7A7A",
+              "margin": "xs"
+            },
+            {
+              "type": "text",
+              "text": "弋揚科技股份有限公司",
+              "weight": "bold",
+              "size": "md",
+              "color": "#1A1A1A",
+              "margin": "lg"
+            },
+            {
+              "type": "separator",
+              "margin": "lg"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "margin": "lg",
+              "contents": [
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "md",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "手機",
+                      "size": "xs",
+                      "color": "#7A7A7A",
+                      "flex": 2,
+                      "gravity": "center"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0983-105-035",
+                      "size": "sm",
+                      "color": "#1E9AD6",
+                      "flex": 7,
+                      "wrap": true
+                    }
+                  ],
+                  "action": {
+                    "type": "uri",
+                    "label": "撥打手機",
+                    "uri": "tel:0983105035"
+                  }
+                },
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "md",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "電話",
+                      "size": "xs",
+                      "color": "#7A7A7A",
+                      "flex": 2,
+                      "gravity": "center"
+                    },
+                    {
+                      "type": "text",
+                      "text": "02-2223-4263 #5003",
+                      "size": "sm",
+                      "color": "#1E9AD6",
+                      "flex": 7,
+                      "wrap": true
+                    }
+                  ],
+                  "action": {
+                    "type": "uri",
+                    "label": "撥打公司",
+                    "uri": "tel:+886222234263,5003"
+                  }
+                },
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "md",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "傳真",
+                      "size": "xs",
+                      "color": "#7A7A7A",
+                      "flex": 2,
+                      "gravity": "center"
+                    },
+                    {
+                      "type": "text",
+                      "text": "07-555-0330",
+                      "size": "sm",
+                      "color": "#1A1A1A",
+                      "flex": 7,
+                      "wrap": true
+                    }
+                  ]
+                },
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "md",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "Email",
+                      "size": "xs",
+                      "color": "#7A7A7A",
+                      "flex": 2,
+                      "gravity": "center"
+                    },
+                    {
+                      "type": "text",
+                      "text": "eason@eup.com.tw",
+                      "size": "sm",
+                      "color": "#1E9AD6",
+                      "flex": 7,
+                      "wrap": true
+                    }
+                  ],
+                  "action": {
+                    "type": "clipboard",
+                    "label": "複製 Email",
+                    "clipboardText": "eason@eup.com.tw"
+                  }
+                },
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "spacing": "md",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "地址",
+                      "size": "xs",
+                      "color": "#7A7A7A",
+                      "flex": 2,
+                      "gravity": "center"
+                    },
+                    {
+                      "type": "text",
+                      "text": "高雄市鼓山區大順一路439號4樓之2",
+                      "size": "sm",
+                      "color": "#1E9AD6",
+                      "flex": 7,
+                      "wrap": true
+                    }
+                  ],
+                  "action": {
+                    "type": "uri",
+                    "label": "地圖",
+                    "uri": "https://www.google.com/maps/search/?api=1&query=%E9%AB%98%E9%9B%84%E5%B8%82%E9%BC%93%E5%B1%B1%E5%8D%80%E5%A4%A7%E9%A0%86%E4%B8%80%E8%B7%AF439%E8%99%9F4%E6%A8%93%E4%B9%8B2"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "backgroundColor": "#D7262E",
+          "paddingAll": "12px",
+          "paddingStart": "20px",
+          "paddingEnd": "20px",
+          "contents": [
+            {
+              "type": "text",
+              "text": "0800-060-958",
+              "color": "#FFFFFF",
+              "weight": "bold",
+              "size": "sm",
+              "flex": 0,
+              "action": {
+                "type": "uri",
+                "label": "免付費專線",
+                "uri": "tel:0800060958"
+              }
+            },
+            {
+              "type": "text",
+              "text": "服務快速．安全守護",
+              "color": "#FFFFFF",
+              "size": "xs",
+              "align": "end",
+              "gravity": "center"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "sm",
+      "paddingAll": "16px",
+      "contents": [
+        {
+          "type": "button",
+          "style": "primary",
+          "color": "#06C755",
+          "height": "sm",
+          "action": {
+            "type": "uri",
+            "label": "加我 LINE 好友",
+            "uri": "https://line.me/ti/p/請換成你的LINE加好友網址"
+          }
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "button",
+              "style": "secondary",
+              "height": "sm",
+              "action": {
+                "type": "uri",
+                "label": "撥打手機",
+                "uri": "tel:0983105035"
+              }
+            },
+            {
+              "type": "button",
+              "style": "secondary",
+              "height": "sm",
+              "action": {
+                "type": "uri",
+                "label": "地圖導航",
+                "uri": "https://www.google.com/maps/search/?api=1&query=%E9%AB%98%E9%9B%84%E5%B8%82%E9%BC%93%E5%B1%B1%E5%8D%80%E5%A4%A7%E9%A0%86%E4%B8%80%E8%B7%AF439%E8%99%9F4%E6%A8%93%E4%B9%8B2"
+              }
+            }
+          ]
+        },
+        {
+          "type": "button",
+          "style": "link",
+          "height": "sm",
+          "color": "#D7262E",
+          "action": {
+            "type": "uri",
+            "label": "把這張名片轉傳給朋友",
+            "uri": "https://liff.line.me/請填入LIFF_ID"
+          }
+        }
+      ]
+    }
+  }
+};
+
+function buildMessage(){
+  let s = JSON.stringify(FLEX_TEMPLATE)
+    .replace("https://line.me/ti/p/請換成你的LINE加好友網址", CONFIG.LINE_URL)
+    .replace("https://liff.line.me/請填入LIFF_ID", "https://liff.line.me/" + CONFIG.LIFF_ID);
+  return JSON.parse(s);
+}
+
+const statusEl = document.getElementById("status");
+const shareBtn = document.getElementById("share");
+const say = t => statusEl.textContent = t;
+
+async function main(){
+  try{
+    await liff.init({ liffId: CONFIG.LIFF_ID });
+  }catch(e){
+    say("LIFF 初始化失敗：請確認 LIFF ID 是否正確（" + e.message + "）");
+    return;
+  }
+  if(!liff.isLoggedIn()){ liff.login({ redirectUri: location.href }); return; }
+  if(!liff.isApiAvailable("shareTargetPicker")){
+    say("請在 LINE 裡開啟這個頁面，或到 LINE Developers 開啟 shareTargetPicker。");
+    return;
+  }
+  shareBtn.disabled = false;
+  say("");
+}
+
+shareBtn.addEventListener("click", async () => {
+  try{
+    const res = await liff.shareTargetPicker([buildMessage()], { isMultiple: true });
+    if(res){ say("名片已送出"); if(liff.isInClient()) setTimeout(()=>liff.closeWindow(), 1200); }
+    else say("已取消傳送");
+  }catch(e){
+    say("傳送失敗：" + e.message);
+  }
+});
+
+main();
+</script>
+</body>
+</html>
