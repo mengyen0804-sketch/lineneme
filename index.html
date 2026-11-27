@@ -448,8 +448,8 @@ const FLEX_TEMPLATE = {
 
 function buildMessage(){
   let s = JSON.stringify(FLEX_TEMPLATE)
-    .replace("https://line.me/ti/p/請換成你的LINE加好友網址", CONFIG.LINE_URL)
-    .replace("https://liff.line.me/請填入LIFF_ID", "https://liff.line.me/" + CONFIG.LIFF_ID);
+    .replaceAll("ttps://line.me/ti/p/aU9sNNkdHA", CONFIG.LINE_URL)
+    .replaceAll("https://liff.line.me/2012828683-QWZ6IfzI", "https://liff.line.me/" + CONFIG.LIFF_ID);
   return JSON.parse(s);
 }
 
