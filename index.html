@@ -448,7 +448,7 @@ const FLEX_TEMPLATE = {
 
 function buildMessage(){
   let s = JSON.stringify(FLEX_TEMPLATE)
-    .replaceAll("ttps://line.me/ti/p/aU9sNNkdHA", CONFIG.LINE_URL)
+    .replaceAll("https://line.me/ti/p/aU9sNNkdHA", CONFIG.LINE_URL)
     .replaceAll("https://liff.line.me/2012828683-QWZ6IfzI", "https://liff.line.me/" + CONFIG.LIFF_ID);
   return JSON.parse(s);
 }
